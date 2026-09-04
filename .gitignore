@@ -1,0 +1,27 @@
+# ===== Java / Maven =====
+target/
+out/
+*.class
+*.jar
+*.war
+*.log
+logs/
+
+# ===== IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== 本地配置（含密钥，禁止提交） =====
+application-local.*
+*.local
+src/main/resources/application-dev.properties

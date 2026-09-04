@@ -1,0 +1,15 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: project-web
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  main:
+    allow-bean-definition-overriding: true

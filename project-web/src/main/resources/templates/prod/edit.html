@@ -1,0 +1,159 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>修改商品信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" th:href="@{/layuiadmin/layui/css/layui.css}" href="/static/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" th:href="@{/layuiadmin/style/admin.css}" href="/static/layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
+     style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="pid" lay-verify="required" placeholder="请输入商品编号" autocomplete="off"
+                   class="layui-input" th:value="${product.pid}" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="pname" lay-verify="required" placeholder="请输入商品名称" autocomplete="off"
+                   class="layui-input" th:value="${product.pname}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品单价</label>
+        <div class="layui-input-inline">
+            <input type="text" name="price" lay-verify="required" placeholder="请输入商品单价" autocomplete="off"
+                   class="layui-input" th:value="${product.price}">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品描述</label>
+        <div class="layui-input-block">
+            <textarea name="description" lay-verify="required" placeholder="请输入商品描述"
+                      class="layui-textarea" th:text="${product.description}"></textarea>
+        </div>
+    </div>
+
+    <!--选择文件与执行上传操作分开-->
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">选完文件后不自动上传</div>
+            <div class="layui-card-body">
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn layui-btn-normal" id="test-upload-change">选择文件</button>
+                    <button type="button" class="layui-btn" id="test-upload-change-action">开始上传</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--定义一个隐藏域。用于存储上传的文件名称-->
+    <div class="layui-form-item">
+        <!--<label class="layui-form-label">商品编号</label>-->
+        <div class="layui-input-inline">
+            <input type="hidden" id="imageName" name="pfile" lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <div class="layui-input-inline">
+            <button class="layui-btn layuiadmin-btn-list layui-btn-normal" lay-submit
+                    lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-add-submit">修改
+            </button>
+            <button class="layui-btn layuiadmin-btn-list layui-btn-primary"
+                    lay-filter="" id="layuiadmin-app-add-cancel">取消
+            </button>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script src="/static/layuiadmin/layui/layui.js" th:src="@{/layuiadmin/layui/layui.js}"></script>
+<script src="/static/js/jquery-3.5.1.min.js" th:src="@{/jquery-3.5.1.min.js}"></script>
+<script>
+    layui.config({
+        base: '/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form','upload'], function () {
+        var $ = layui.$
+            , layer = parent.layer === undefined ? layui.layer : parent.layer
+            , form = layui.form
+            , upload = layui.upload;
+
+
+        //选完文件后不自动上传执行的函数，
+        // 注意：这种方式在控制器只能通过MultipartFile file接收被上传的文件对象，变量名必须叫file
+        upload.render({
+            elem: '#test-upload-change'
+            ,url: '/upload'
+            ,auto: false //取消自动上传
+            //,multiple: true  //用于多文件上传
+            ,bindAction: '#test-upload-change-action'
+            ,done: function(res){
+                //         // alert("res:"+res);
+                //         // alert("code:"+res.code);
+                //         // alert("msg:"+res.msg);
+                //         // alert("data:"+res.data);
+                //
+                //将控制器返回的文件名称赋值给隐藏域
+                $("#imageName").val(res.data);
+            }
+        });
+
+
+        //监听提交
+        form.on('submit(layuiadmin-app-form-submit)', function (data) {
+            var field = data.field; //获取提交的字段
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            console.log(field);
+            var parent$ = window.parent.layui.jquery;
+
+            //提交 Ajax 成功后，关闭当前弹层并重载表格
+            $.ajax({
+                type: 'post',
+                url: '/prod/doEdit', // ajax请求路径
+                data: field,
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == '0') {
+                        let param_search = {
+                            pname: parent$("#search_prodName").val(),
+                        };
+                        parent.tableRender(parent.layui.table, param_search);
+                        layer.msg('修改成功', {
+                            time: 1000,
+                            end: function () {
+                                parent.layer.close(index); //再执行关闭
+                            }
+                        });
+                    } else {
+                        layer.msg('修改失败', {
+                            time: 1000,
+                            end: function () {
+                                parent.layer.close(index); //再执行关闭
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    })
+
+    $("#layuiadmin-app-add-cancel").on('click', function () {
+        console.log("cancel click");
+        parent.layer.close(parent.layer.getFrameIndex(window.name)); //再执行关闭
+    });
+</script>
+</html>

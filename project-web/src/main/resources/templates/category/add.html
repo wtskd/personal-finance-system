@@ -1,0 +1,72 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>新增收支分类</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" th:href="@{/layuiadmin/layui/css/layui.css}" href="/static/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" th:href="@{/layuiadmin/style/admin.css}" href="/static/layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+<div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="categoryName" lay-verify="required" placeholder="请输入分类名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">预算金额</label>
+        <div class="layui-input-inline">
+            <input type="text" name="amount" placeholder="请输入预算金额" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-inline">
+            <select name="typeId">
+                <option value="1">收入</option>
+                <option value="2">支出</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            <textarea name="description" placeholder="请输入描述" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <div class="layui-input-inline">
+            <button class="layui-btn layuiadmin-btn-list layui-btn-normal" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-add-submit">添加</button>
+            <button class="layui-btn layuiadmin-btn-list layui-btn-primary" lay-filter="" id="layuiadmin-app-add-cancel">取消</button>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/static/layuiadmin/layui/layui.js" th:src="@{/layuiadmin/layui/layui.js}"></script>
+<script src="/static/js/jquery-3.5.1.min.js" th:src="@{/jquery-3.5.1.min.js}"></script>
+<script>
+    layui.config({ base: '/layuiadmin/' }).extend({ index: 'lib/index' }).use(['index', 'form'], function () {
+        var $ = layui.jquery, layer = parent.layer === undefined ? layui.layer : parent.layer, form = layui.form;
+        form.on('submit(layuiadmin-app-form-submit)', function (data) {
+            var field = data.field;
+            var index = parent.layer.getFrameIndex(window.name);
+            var parent$ = window.parent.layui.jquery;
+            $.ajax({
+                type: 'post', url: '/category/doAdd', data: field,
+                success: function (data) {
+                    if (data.code == '0') {
+                        var param_search = { categoryName: parent$("#search_categoryName").val(), typeIdStr: parent$("#search_typeId").val() };
+                        parent.tableRender(parent.layui.table, param_search);
+                        layer.msg('添加成功', { time: 1000, end: function () { parent.layer.close(index); } });
+                    } else { layer.msg('添加失败', { time: 1000, end: function () { parent.layer.close(index); } }); }
+                }
+            });
+        });
+    });
+    $("#layuiadmin-app-add-cancel").on('click', function () { parent.layer.close(parent.layer.getFrameIndex(window.name)); });
+</script>
+</html>

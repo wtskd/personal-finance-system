@@ -1,0 +1,123 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>修改交易记录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" th:href="@{/layuiadmin/layui/css/layui.css}" href="/static/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" th:href="@{/layuiadmin/style/admin.css}" href="/static/layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
+     style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">交易编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="transactionId" lay-verify="required" placeholder="交易编号" autocomplete="off"
+                   class="layui-input" th:value="${transaction.transactionId}" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">金额</label>
+        <div class="layui-input-inline">
+            <input type="text" name="amount" lay-verify="required" placeholder="请输入金额" autocomplete="off"
+                   class="layui-input" th:value="${transaction.amount}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">交易类型</label>
+        <div class="layui-input-inline">
+            <select name="status">
+                <option value="收入" th:selected="${transaction.status == '收入'}">收入</option>
+                <option value="支出" th:selected="${transaction.status == '支出'}">支出</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">账户ID</label>
+        <div class="layui-input-inline">
+            <input type="number" name="accountId" lay-verify="required" placeholder="请输入账户ID" autocomplete="off"
+                   class="layui-input" th:value="${transaction.accountId}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类ID</label>
+        <div class="layui-input-inline">
+            <input type="number" name="categoryId" lay-verify="required" placeholder="请输入分类ID" autocomplete="off"
+                   class="layui-input" th:value="${transaction.categoryId}">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <div class="layui-input-inline">
+            <button class="layui-btn layuiadmin-btn-list layui-btn-normal" lay-submit
+                    lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-add-submit">修改
+            </button>
+            <button class="layui-btn layuiadmin-btn-list layui-btn-primary"
+                    lay-filter="" id="layuiadmin-app-add-cancel">取消
+            </button>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script src="/static/layuiadmin/layui/layui.js" th:src="@{/layuiadmin/layui/layui.js}"></script>
+<script src="/static/js/jquery-3.5.1.min.js" th:src="@{/jquery-3.5.1.min.js}"></script>
+<script>
+    layui.config({
+        base: '/layuiadmin/'
+    }).extend({
+        index: 'lib/index'
+    }).use(['index', 'form'], function () {
+        var $ = layui.$
+            , layer = parent.layer === undefined ? layui.layer : parent.layer
+            , form = layui.form;
+
+        form.on('submit(layuiadmin-app-form-submit)', function (data) {
+            var field = data.field;
+            var index = parent.layer.getFrameIndex(window.name);
+            console.log(field);
+            var parent$ = window.parent.layui.jquery;
+
+            $.ajax({
+                type: 'post',
+                url: '/transaction/doEdit',
+                data: field,
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == '0') {
+                        let param_search = {
+                            status: parent$("#search_status").val(),
+                            accountIdStr: parent$("#search_accountId").val()
+                        };
+                        parent.tableRender(parent.layui.table, param_search);
+                        layer.msg('修改成功', {
+                            time: 1000,
+                            end: function () {
+                                parent.layer.close(index);
+                            }
+                        });
+                    } else {
+                        layer.msg('修改失败', {
+                            time: 1000,
+                            end: function () {
+                                parent.layer.close(index);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    })
+
+    $("#layuiadmin-app-add-cancel").on('click', function () {
+        console.log("cancel click");
+        parent.layer.close(parent.layer.getFrameIndex(window.name));
+    });
+</script>
+</html>

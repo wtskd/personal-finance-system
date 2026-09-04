@@ -1,0 +1,58 @@
+# ====================================================================
+# Gateway 网关全局配置文件
+# 端口 9999，整合 Nacos 注册中心，配置路由规则与跨域处理
+# ====================================================================
+server:
+  port: 9999
+
+spring:
+  # ===== 应用名称 =====
+  application:
+    name: gateway
+
+  cloud:
+    # ===== Nacos 注册中心配置 =====
+    # 网关自身注册到 Nacos，同时通过 lb:// 前缀动态发现下游服务
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+    # ===== Gateway 配置 =====
+    gateway:
+      # ===== 跨域配置（CORS） =====
+      # 前端请求通过网关时，由网关统一处理跨域，下游服务无需重复配置
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowCredentials: false        # 不允许携带认证信息（如 Cookie）
+            allowedOriginPatterns: "*"     # 允许所有来源跨域
+            allowedHeaders: "*"            # 允许所有请求头
+            allowedMethods:                # 允许的 HTTP 方法
+              - OPTIONS
+              - GET
+              - POST
+            max-age: 3600                 # 跨域预检请求缓存时间（秒）
+
+      # ===== 路由规则 =====
+      routes:
+        # ----- 路由 1：project-web（前端 Web 服务） -----
+        # 访问 http://localhost:9999/project-web/xxx
+        # → StripPrefix 去掉 /project-web 前缀
+        # → 转发到 lb://project-web 对应的实例
+        - id: project-web-route
+          uri: lb://project-web
+          predicates:
+            - Path=/project-web/**
+          filters:
+            - StripPrefix=1
+
+        # ----- 路由 2：project-service（后端业务服务） -----
+        # 访问 http://localhost:9999/project-service/xxx
+        # → StripPrefix 去掉 /project-service 前缀
+        # → 转发到 lb://project-service 对应的实例
+        - id: project-service-route
+          uri: lb://project-service
+          predicates:
+            - Path=/project-service/**
+          filters:
+            - StripPrefix=1

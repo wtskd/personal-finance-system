@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baidu.dao.CategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.baidu.pojo.Category">
+        <id column="category_id" property="categoryId" />
+        <result column="category_name" property="categoryName" />
+        <result column="amount" property="amount" />
+        <result column="icon" property="icon" />
+        <result column="description" property="description" />
+        <result column="type_id" property="typeId" />
+    </resultMap>
+
+    <!-- 分页查询 -->
+    <select id="getCategoryByPage" resultMap="BaseResultMap">
+        SELECT * FROM t_category
+        WHERE 1=1
+        <if test="categoryName != null">
+            AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+        </if>
+        <if test="typeId != null">
+            AND type_id = #{typeId}
+        </if>
+        LIMIT #{start}, #{pageSize}
+    </select>
+
+    <!-- 统计总数 -->
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM t_category
+        WHERE 1=1
+        <if test="categoryName != null">
+            AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+        </if>
+        <if test="typeId != null">
+            AND type_id = #{typeId}
+        </if>
+    </select>
+
+</mapper>

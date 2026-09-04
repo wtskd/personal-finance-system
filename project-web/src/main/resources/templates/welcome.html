@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/css/welcome.css}" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div id="up">
+    <ul>
+        <li><span>个人财务管理系统首页</span></li>
+    </ul>
+</div>
+<div id="down">
+    <div id="d1">
+        <span class="s1">
+            热烈欢迎:
+            <span style="color:red; weight:bolder;" th:text="${session.user2.name}"></span>
+        </span>
+        <span class="s2">访问本系统！！！</span>
+    </div>
+    <div id="d2"></div>
+</div>
+</body>
+</html>

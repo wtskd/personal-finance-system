@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baidu.dao.TransactionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.baidu.pojo.Transaction">
+        <id column="transaction_id" property="transactionId" />
+        <result column="amount" property="amount" />
+        <result column="account_id" property="accountId" />
+        <result column="create_time" property="createTime" />
+        <result column="status" property="status" />
+        <result column="category_id" property="categoryId" />
+        <!-- 分类名称（非实体字段，仅用于列表展示） -->
+        <result column="category_name" property="categoryName" />
+        <!-- 一对一关联账户 -->
+        <association property="financeAccount" javaType="com.baidu.pojo.FinanceAccount">
+            <result column="acc_id" property="accountId" />
+            <result column="acc_name" property="accountName" />
+            <result column="acc_balance" property="balance" />
+        </association>
+    </resultMap>
+
+    <!-- 分页查询交易记录（关联账户和分类） -->
+    <select id="getTransactionByPage" resultMap="BaseResultMap">
+        SELECT t.transaction_id, t.amount, t.account_id, t.create_time, t.status, t.category_id,
+               a.account_id AS acc_id, a.account_name AS acc_name, a.balance AS acc_balance,
+               c.category_name
+        FROM t_transaction t
+        LEFT JOIN t_account a ON t.account_id = a.account_id
+        LEFT JOIN t_category c ON t.category_id = c.category_id
+        WHERE 1=1
+        <if test="accountId != null">
+            AND t.account_id = #{accountId}
+        </if>
+        <if test="status != null and status != ''">
+            AND t.status = #{status}
+        </if>
+        ORDER BY t.create_time DESC
+        LIMIT #{start}, #{pageSize}
+    </select>
+
+    <!-- 统计总数 -->
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM t_transaction
+        WHERE 1=1
+        <if test="accountId != null">
+            AND account_id = #{accountId}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>个人财务管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+    <link rel="stylesheet" th:href="@{/layuiadmin/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/layuiadmin/style/admin.css}" media="all">
+    <link rel="stylesheet" th:href="@{/layuiadmin/style/template.css}" media="all">
+</head>
+<body>
+
+<div class="layui-fluid" id="LAY-component-nav" style="padding:0px;">
+    <div class="layui-row">
+        <div class="layui-col-md8 layui-col-md-offset2">
+            <div class="layui-card">
+                <div class="layui-card-body"  style="padding:0px; margin:0px;margin-bottom:10px;">
+                    <ul class="layui-nav" lay-filter="component-nav">
+                        <li class="layui-nav-item">
+                            <a th:href="@{/prod/index.html}">首页</a>
+                        </li>
+                        <li class="layui-nav-item layui-this">
+                            <a href="javascript:;">收入管理</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a href="javascript:;">支出管理</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a href="javascript:;">预算管理</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a href="javascript:;">公告</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a th:href="@{/toUserIndex}">个人中心</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a th:href="@{/cart/showcartList}">购物车</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a th:href="@{/user/toUserLogin}">用户登录</a>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a th:href="@{/user/toLogin}">后台管理</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--</div>-->
+
+<!--轮播图-->
+    <div class="layui-row" style="margin-bottom:10px;">
+        <div class="layui-col-md8 layui-col-md-offset2">
+            <div class="layui-carousel" id="test-carousel-demo" lay-filter="test-carousel-demo">
+                <div carousel-item="">
+                    <div><img src="/img/01.png" width="1010" height="450"/></div>
+                    <div><img src="/img/02.png" width="1010" height="450"/></div>
+                    <div><img src="/img/03.png" width="1010" height="450"/></div>
+                    <div><img src="/img/04.png" width="1010" height="450"/></div>
+                    <div><img src="/img/05.png" width="1010" height="450"/></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!--商品列表-->
+    <div class="layui-row">
+        <div class="layui-col-md8 layui-col-md-offset2">
+            <div class="layui-col-md4 layui-col-sm4" th:each="product:${list}">
+                <div class="cmdlist-container" style="background:lightgrey;margin-right:5px;margin-bottom:5px;">
+                    <a th:href="@{/prod/getProdById/{id}(id=${product.pid})}">
+                        <img th:src="@{${product.pfile}}" width="415" height="265">
+                    </a>
+                    <a th:href="@{/prod/getProdById/{id}(id=${product.pid})}">
+                        <div class="cmdlist-text">
+                            <p class="info" th:text="${product.description}"></p>
+                            <div class="price">
+                                <b th:text="${product.pname}">商品名称</b>
+                                <p>
+                                    ￥<span  th:text="${product.price}"></span>
+                                </p>
+                                <span class="flow">
+                      <i class="layui-icon layui-icon-rate"></i>
+                      433
+                    </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+
+
+            <!--分页组件位置-->
+            <div class="layui-col-md12 layui-col-sm12">
+                <div id="demo0"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <input type="hidden" id="current" th:value="${pages}">
+    <input type="hidden" id="totalCount" th:value="${totalCount}">
+
+</div>
+
+<script th:src="@{/layuiadmin/layui/layui.js}"></script>
+<script>
+
+    //获取从控制器发送过来的当前页与总记录数
+    var pages=document.getElementById("current").value;
+    var totalCount=document.getElementById("totalCount").value;
+
+
+    layui.config({
+        base: '/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'carousel', 'form','laypage', 'layer'], function () {
+        var carousel = layui.carousel
+            , form = layui.form;
+
+        //常规轮播
+        carousel.render({
+            elem: '#test-carousel-normal'
+            , arrow: 'always'
+        });
+
+        //改变下时间间隔、动画类型、高度
+        carousel.render({
+            elem: '#test-carousel-normal-2'
+            , interval: 1800
+            , anim: 'fade'
+            , height: '120px'
+        });
+
+        //设定各种参数
+        var ins3 = carousel.render({
+            elem: '#test-carousel-demo'
+        });
+        //图片轮播
+        carousel.render({
+            elem: '#test-carousel-demo'
+            , width: '1010px'
+            , height: '450px'
+            , interval: 5000
+        });
+
+        //事件
+        carousel.on('change(test-carousel-demo)', function (res) {
+            console.log(res)
+        });
+
+        var $ = layui.$, active = {
+            set: function (othis) {
+                var THIS = 'layui-bg-normal'
+                    , key = othis.data('key')
+                    , options = {};
+
+                othis.css('background-color', '#5FB878').siblings().removeAttr('style');
+                options[key] = othis.data('value');
+                ins3.reload(options);
+            }
+        };
+
+        //分页组件
+        var laypage = layui.laypage
+            ,layer = layui.layer;
+
+        //总页数低于页码总数
+        laypage.render({
+            elem: 'demo0'
+            ,count: totalCount //数据总数
+            ,limit:6
+            ,curr: pages
+            ,jump: function (obj, first) { //obj为当前页的属性和方法，第一次加载first为true
+               // alert(obj.curr); //obj.curr表示当前页
+                if (!first) {	//非首次加载
+                    console.log(obj.curr); //obj.curr表示当前页
+                    location.href="/prod/index.html?currentPage="+obj.curr;
+                }
+            }
+        });
+
+    });
+
+</script>
+</body>
+</html>

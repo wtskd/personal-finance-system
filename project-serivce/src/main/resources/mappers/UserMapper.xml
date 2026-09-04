@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baidu.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="User">
+        <id column="uid" property="uid" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="telephone" property="telephone" />
+        <result column="createTime" property="createTime" />
+        <result column="role_id" property="roleId" />
+
+        <association property="myRole" javaType="Role">
+            <result property="rid" column="rid"/>
+            <result property="roleName" column="roleName"/>
+        </association>
+    </resultMap>
+
+    <select id="getUserByPage" resultMap="BaseResultMap">
+        SELECT u.*,r.*
+        FROM USER u, role r
+        WHERE u.role_id = r.rid
+        <if test="na != null and na != ''">
+            AND NAME LIKE concat("%",#{na},"%")
+        </if>
+        LIMIT #{st},#{pagesize};
+    </select>
+
+    <select id="mycount" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM USER u, role r
+        WHERE u.role_id = r.rid
+        <if test="name != null">
+            AND NAME LIKE concat("%",#{name},"%")
+        </if>
+    </select>
+
+
+</mapper>
