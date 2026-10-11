@@ -1,1 +1,12 @@
 * text=auto
+
+# ---- GitHub 语言统计覆盖 ----
+# Layui 后台模板与前端压缩库属于第三方资源，不计入语言统计
+project-web/src/main/resources/static/layuiadmin/** linguist-vendored
+**/*.min.js linguist-vendored
+**/*.min.css linguist-vendored
+
+# 前端页面基于 Layui 模板生成，不计入项目主语言，
+# 使仓库语言标签正确反映后端主体（Spring Boot / Java）
+project-web/src/main/resources/templates/** linguist-detectable=false
+project-web/src/main/resources/static/**/*.html linguist-detectable=false
